@@ -65,7 +65,7 @@ class HPDisplayController:
             # print("برنامه HPDisplayCenter با موفقیت اجرا شد.")
 
             # Wait to open App
-            time.sleep(5)
+            # time.sleep(5)
 
             # Clicking Codes
             # First Click: Open Monitor Selection PopUp => X:595 & Y:251
@@ -112,7 +112,7 @@ class HPDisplayController:
             # print("HPDisplayCenter Running Successfully.")
 
             # Wait to open App
-            time.sleep(5)
+            # time.sleep(5)
 
             # Clicking Codes
             # First Click: Open Monitor Selection PopUp => X:595 & Y:251
