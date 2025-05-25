@@ -54,7 +54,7 @@ def hp_dp_swithcer():
 
         # Running HPDisplayCenter.exe
         subprocess.Popen(app_path)
-        print("برنامه HPDisplayCenter با موفقیت اجرا شد.")
+        print("HPDisplayCenter Running Successfully.")
 
         # Wait to open App
         time.sleep(5)
@@ -84,7 +84,7 @@ def hp_dp_swithcer():
         print("HDMI port selected.")
 
         # Five Click: Click on `DisplayPort` Button => X:511 & Y:38006
-        pyautogui.moveTo(511, 38006, duration=1)
+        pyautogui.moveTo(509, 380, duration=1)
         pyautogui.click()
         print("HDMI port selected.")
 
