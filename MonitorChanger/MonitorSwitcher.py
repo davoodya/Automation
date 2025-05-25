@@ -2,6 +2,8 @@ import subprocess
 import pyautogui
 import time
 import psutil
+import keyboard
+import sys
 
 class HPDisplayController:
     def __init__(self):
@@ -52,7 +54,7 @@ class HPDisplayController:
             print(f"Error when Closing HPDisplayCenter: {e}")
             return False
 
-    def hp_hdmi_swithcer(self):
+    def hp_hdmi_switcher(self):
         try:
             self.launch_app()
             # # HP Display Center Exe file path
@@ -93,12 +95,13 @@ class HPDisplayController:
 
         #x:511  y: 38006
         except Exception as e:
-            print(f"خطا رخ داده است: {e}")
+            print(f"Error when Switching to HDMI Port {e}")
 
-        except Exception as e:
-            print(f"خطا رخ داده است: {e}")
+        finally:
+            self.close_app()
+            print("HPDisplayCenter Closed Successfully")
 
-    def hp_dp_swithcer(self):
+    def hp_dp_switcher(self):
         try:
             self.launch_app()
             # # HP Display Center Exe file path
@@ -142,23 +145,62 @@ class HPDisplayController:
 
             print("HP Monitor Changed to HDMI Port")
 
+
         #x:511  y: 38006
         except Exception as e:
-            print(f"خطا رخ داده است: {e}")
+            print(f"Error when Switching to Display Port {e}")
+        finally:
+            self.close_app()
+            print("HPDisplayCenter Closed Successfully")
 
+
+def setup_hotkeys(controller):
+    """تنظیم کلیدهای ترکیبی"""
+    keyboard.add_hotkey('ctrl+alt+f5', controller.hp_hdmi_switcher)
+    keyboard.add_hotkey('ctrl+alt+f6', controller.hp_dp_switcher)
+    keyboard.add_hotkey('ctrl+alt+q', lambda: sys.exit(0))
 
 if __name__ == "__main__":
+    # نیاز به نصب ماژول‌های لازم: pip install psutil pyautogui keyboard
     hpController = HPDisplayController()
-    monitor = 0
-    while int(monitor) != 99:
-        monitor = input("Enter 1 for HDMI, 2 for Display Port, 99 for Exit: \n ::: ")
-        if int(monitor) == 1:
-            hpController.hp_hdmi_swithcer()
-            hpController.close_app()
-        elif int(monitor) == 2:
-            hpController.hp_dp_swithcer()
-            hpController.close_app()
-        elif int(monitor) == 99:
-            print("Goodbye Ninja.! 🥷🏼")
-        else:
-            print("Invalid Input !!!")
+
+    print("""
+    ======================================
+    HP Display Controller - Hotkey Mode
+    ======================================
+    Shortcuts:
+    CTRL+ALT+F5  -> Switch to HDMI
+    CTRL+ALT+F6  -> Switch to DisplayPort
+    CTRL+ALT+Q   -> Exit Program
+    ======================================
+    Program is running in background...
+    Press CTRL+ALT+Q to exit
+    """)
+
+    # تنظیم کلیدهای ترکیبی
+    setup_hotkeys(hpController)
+
+    # نگه داشتن برنامه در حالت اجرا
+    try:
+        keyboard.wait()  # برنامه تا فشرده شدن کلید خروج فعال می‌ماند
+    except KeyboardInterrupt:
+        pass
+    finally:
+        print("Program terminated.")
+
+
+# if __name__ == "__main__":
+#     hpController = HPDisplayController()
+#     monitor = 0
+#     while int(monitor) != 99:
+#         monitor = input("Enter 1 for HDMI, 2 for Display Port, 99 for Exit: \n ::: ")
+#         if int(monitor) == 1:
+#             hpController.hp_hdmi_swithcer()
+#             hpController.close_app()
+#         elif int(monitor) == 2:
+#             hpController.hp_dp_swithcer()
+#             hpController.close_app()
+#         elif int(monitor) == 99:
+#             print("Goodbye Ninja.! 🥷🏼")
+#         else:
+#             print("Invalid Input !!!")
