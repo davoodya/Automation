@@ -2,6 +2,7 @@ import subprocess
 import pyautogui
 import time
 import psutil
+from security import safe_command
 
 class HPDisplayController:
     def __init__(self):
@@ -21,13 +22,13 @@ class HPDisplayController:
             print("HPDisplayCenter is Running, Open Windows Now ")
             try:
                 # activate HP Display Windows
-                subprocess.Popen([self.app_path, '--activate'])
+                safe_command.run(subprocess.Popen, [self.app_path, '--activate'])
             except:
                 print("Error when try to Open HPDisplayCenter Windows")
         else:
             print("HPDisplay Center is not Running!")
             try:
-                subprocess.Popen(self.app_path)
+                safe_command.run(subprocess.Popen, self.app_path)
                 print("Now HP Display Center  Running Successfully")
             except Exception as e:
                 print(f"Error when Running HPDisplayCenter: {e}")
