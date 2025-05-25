@@ -37,6 +37,21 @@ class HPDisplayController:
         time.sleep(5)
         return True
 
+    def close_app(self):
+        """Closing HPDisplayCenter"""
+        try:
+            for process in psutil.process_iter(['name', 'pid']):
+                if process.info['name'] == self.app_name:
+                    proc = psutil.Process(process.info['pid'])
+                    proc.terminate()  # Using proc.kill() => For Force CLosing using
+                    print("HPDisplayCenter Closed Successfully")
+                    return True
+            print("HPDisplayCenter is not Running!")
+            return False
+        except Exception as e:
+            print(f"Error when Closing HPDisplayCenter: {e}")
+            return False
+
     def hp_hdmi_swithcer(self):
         try:
             self.launch_app()
@@ -139,7 +154,11 @@ if __name__ == "__main__":
         monitor = input("Enter 1 for HDMI, 2 for Display Port, 99 for Exit: \n ::: ")
         if int(monitor) == 1:
             hpController.hp_hdmi_swithcer()
+            hpController.close_app()
         elif int(monitor) == 2:
             hpController.hp_dp_swithcer()
+            hpController.close_app()
+        elif int(monitor) == 99:
+            print("Goodbye Ninja.! 🥷🏼")
         else:
             print("Invalid Input !!!")
