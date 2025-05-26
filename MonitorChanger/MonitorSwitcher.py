@@ -9,6 +9,54 @@ class HPDisplayController:
     def __init__(self):
         self.app_path = r"C:\Program Files\WindowsApps\AD2F1837.HPDisplayCenter_2.2.8.0_x64__v10z8vjag6ke6\HPDisplayCenter.exe"
         self.app_name = "HPDisplayCenter.exe"
+        self.app_window = None
+
+    def get_primary_monitor_center(self):
+        # Return the center coordinates of the primary monitor
+        monitors = pyautogui.getAllMonitors()
+        primary_monitor = [m for m in monitors if m.is_primary][0]
+        return (
+            primary_monitor.left + (primary_monitor.width // 2),
+            primary_monitor.top + (primary_monitor.height // 2)
+        )
+
+    def move_window_to_center(self, hwnd):
+        # Move the window to the center of the primary monitor
+        try:
+            # Get Primary monitor status
+            monitor_info = win32api.GetMonitorInfo(win32api.MonitorFromPoint((0,0)))
+            work_area = monitor_info["Work"]
+
+            # Get Primary Monitor Size
+            window_rect = win32gui.GetWindowRect(hwnd)
+            window_width = window_rect[2] - window_rect[0]
+            window_height = window_rect[3] - window_rect[1]
+
+            # Calculate new position
+            new_x = work_area[0] + (work_area[2] - work_area[0] - window_width) // 2
+            new_y = work_area[1] + (work_area[3] - work_area[1] - window_height) // 2
+
+            # Moving Windows to the center of primary monitor
+            win32gui.MoveWindow(hwnd, new_x, new_y, window_width, window_height, True)
+            return True
+        except Exception as e:
+            print(f"Error when Moving Windows to Center of Screen 1: {e}")
+            return False
+
+    def find_app_window(self, timeout=10):
+       # this function is used to find the window of the HPDisplayCenter
+        start_time = time.time()
+
+        while time.time() - start_time < timeout:
+            try:
+                hwnd = win32gui.FindWindow(None, "HP Display Center")
+                if hwnd:
+                    self.app_window = hwnd
+                    return True
+            except:
+                pass
+            time.sleep(0.5)
+        return False
 
     def is_app_running(self):
         # Checking is App Running or not?
@@ -18,26 +66,33 @@ class HPDisplayController:
         return False
 
     def launch_app(self):
-        # Launching HPDisplayCenter or open HPDisplayCenter
-        if self.is_app_running():
-            print("HPDisplayCenter is Running, Open Windows Now ")
+            # Launch the application in the Center of Primary Monitor
             try:
-                # activate HP Display Windows
-                subprocess.Popen([self.app_path, '--activate'])
-            except:
-                print("Error when try to Open HPDisplayCenter Windows")
-        else:
-            print("HPDisplay Center is not Running!")
-            try:
-                subprocess.Popen(self.app_path)
-                print("Now HP Display Center  Running Successfully")
+                # If App is Running then Activate app windows, else Launch the App
+                if self.is_app_running():
+                    print("HPDisplayCenter is already running => Activating...")
+                    subprocess.Popen([self.app_path, '--activate'])
+                else:
+                    print("HPDisplayCenter is not running => Running...")
+                    subprocess.Popen(self.app_path)
+
+                # Waiting to open HPDisplayCenter Windows
+                if not self.find_app_window():
+                    print("HPDisplayCenter Windows is not found!")
+                    return False
+
+                # Moving HPDisplayCenter Windows to Center of Primary Monitor
+                self.move_window_to_center(self.app_window)
+
+                # Activate HPDisplayCenter Windows
+                win32gui.SetForegroundWindow(self.app_window)
+
+                print("HPDisplayCenter is Running in the Center of Primary Monitor Successfully!")
+                return True
+
             except Exception as e:
                 print(f"Error when Running HPDisplayCenter: {e}")
                 return False
-
-        # صبر کردن تا برنامه باز شود
-        time.sleep(5)
-        return True
 
     def close_app(self):
         """Closing HPDisplayCenter"""
